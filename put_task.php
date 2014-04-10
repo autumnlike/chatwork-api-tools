@@ -1,4 +1,6 @@
-<?
+<?php
+
+require_once('./post.php');
 
 // 引数を args => value の形で配列に入れる
 if ( $argc > 0 ) {
@@ -54,19 +56,4 @@ $params = array(
     'to_ids' => $userIds,
 );
 
-$url = "https://api.chatwork.com/v1/rooms/{$roomId}/tasks";
-
-$headers = array(
-    'X-ChatWorkToken:' . $token,
-    "Content-Type: application/x-www-form-urlencoded",
-    "Content-Length: " . strlen(http_build_query($params))
-);
-$options = array('http' => array(
-    'method' => 'POST',
-    'content' => http_build_query($params),
-    'header' => implode("\r\n", $headers),
-));
-
-if (!$contents = file_get_contents($url, false, stream_context_create($options))) {
-    echo "処理失敗しました\n";
-}
+post($roomId, $token, $params, 'tasks');
