@@ -54,12 +54,10 @@ $params = array(
     'to_ids' => $userIds,
 );
 
-var_export($params);
 $url = "https://api.chatwork.com/v1/rooms/{$roomId}/tasks";
 
 $headers = array(
     'X-ChatWorkToken:' . $token,
-    'User-Agent: PUT TASK PHP',
     "Content-Type: application/x-www-form-urlencoded",
     "Content-Length: " . strlen(http_build_query($params))
 );
