@@ -1,59 +1,20 @@
 <?php
 
 require_once('./post.php');
+require_once('./args.php');
+require_once('./body.php');
 
-// 引数を args => value の形で配列に入れる
-if ( $argc > 0 ) {
-    foreach( $argv as $strArg ){
-        if ( ( $arrTmp = explode('==', $strArg) ) && count($arrTmp) > 1 ) {
-            $args[$arrTmp[0]] = $arrTmp[1];
-        }
-    }
-}
+// 引数のパラメータを取得
+$args = get_args($argc, $argv);
+check_args($args, array('body', 'token', 'room_id', 'to_ids'));
 
-// 必要パラメータ確認
-if ($argc < 1
-    || empty($args)
-    || empty($args['body'])
-    || empty($args['token'])
-    || empty($args['room_id'])
-    || empty($args['to_ids'])
-) {
-    echo "引数が不正なため処理を停止しました\n";
-    echo "ex) php put_task.php token==TOKEN room_id==ROOM_ID to_ids==ID_1,ID_2,ID_3 limit=Y-m-d body==本文\n";
-    exit;
-}
-
-unset($argv[0]);
-
-// 期限
-$limit = empty($args['limit']) ? time() : strtotime($args['limit']);
-
-// タスクにするID
-$userIds = $args['to_ids'];
-
-// 文面
-$body = $args['body'];
-
-// token
-$token = $args['token'];
-
-// room_id
-$roomId = $args['room_id'];
-
-// To設定
-if (!empty($args['to_ids'])) {
-    $to = null;
-    foreach (preg_split('/,/', $args['to_ids']) as $id) {
-        $to .= "[To:{$id}]";
-    }
-    $body = $to . "\n\n" . $body;
-}
+// Toをセット
+$args['body'] = set_to_message($args['body'], $args['to_ids']);
 
 $params = array(
-    'body'   => $body,
-    'limit'  => $limit,
-    'to_ids' => $userIds,
+    'body'   => $args['body'],
+    'limit'  => $args['limit'],
+    'to_ids' => $args['to_ids'],
 );
 
-post($roomId, $token, $params, 'tasks');
+post($args['room_id'], $args['token'], $params, 'tasks');
