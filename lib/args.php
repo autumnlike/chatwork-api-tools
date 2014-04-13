@@ -9,11 +9,22 @@
  * @access public
  */
 function get_args($argc, $argv) {
+    $argNames = array(
+        'token',
+        'room_id',
+        'body',
+        'type',
+        'to_ids',
+        'limit',
+    );
+
     $args = array();
     if ( $argc > 0 ) {
         foreach( $argv as $strArg ){
-            if ( ( $arrTmp = explode('==', $strArg) ) && count($arrTmp) > 1 ) {
-                $args[$arrTmp[0]] = $arrTmp[1];
+            foreach ($argNames as $names) {
+                if (preg_match("/^({$names}=)/", $strArg)) {
+                    $args[$names] = preg_replace("/^({$names}=)/", '', $strArg);
+                }
             }
         }
     }
@@ -48,7 +59,7 @@ function check_args($args, $requiredArgs = array('token')) {
     if ($success == false) {
         var_export($args);
         echo "引数が不正なため処理を停止しました\n";
-        echo "ex) php put_task.php token==TOKEN room_id==ROOM_ID to_ids==ID_1,ID_2,ID_3 limit=Y-m-d body==本文\n";
+        echo "ex) php put_task.php token=TOKEN room_id=ROOM_ID to_ids=ID_1,ID_2,ID_3 limit=Y-m-d type=messages body=本文\n";
         exit;
     }
 }
